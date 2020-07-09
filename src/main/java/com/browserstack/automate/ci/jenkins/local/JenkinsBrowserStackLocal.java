@@ -82,7 +82,6 @@ public class JenkinsBrowserStackLocal extends Local implements Serializable {
     }
 
     public void start() throws Exception {
-        PluginLogger.log(logger,"");
         PluginLogger.log(logger,"Checking local options");
         Map<String, String> localOptions = new HashMap<String, String>();
         localOptions.put("key", accesskey);
@@ -97,7 +96,7 @@ public class JenkinsBrowserStackLocal extends Local implements Serializable {
           localOptions.put("binarypath", binarypath);
           PluginLogger.log(logger,"binarypath is "+binarypath);
         }else {
-          PluginLogger.log(logger,"binarypath is not added "+binarypath);
+          PluginLogger.log(logger,"binarypath is not added");
         }
         
         PluginLogger.log(logger,"Starting local");
