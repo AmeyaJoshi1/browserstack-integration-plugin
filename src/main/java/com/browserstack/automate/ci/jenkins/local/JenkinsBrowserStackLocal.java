@@ -6,10 +6,12 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import jenkins.security.MasterToSlaveCallable;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,10 +82,33 @@ public class JenkinsBrowserStackLocal extends Local implements Serializable {
     }
 
     public void start() throws Exception {
+        PluginLogger.log(logger,"Checking local options");
         Map<String, String> localOptions = new HashMap<String, String>();
         localOptions.put("key", accesskey);
-        if (binarypath != null && binarypath.length() > 0) localOptions.put("binarypath", binarypath);
-        super.start(localOptions);
+        
+        if(accesskey == null || accesskey.length()==0) {
+          PluginLogger.log(logger,"Access key is empty");
+        }else {
+          PluginLogger.log(logger,"Access key is not empty");
+        }
+        
+        if (binarypath != null && binarypath.length() > 0) {
+          localOptions.put("binarypath", binarypath);
+          PluginLogger.log(logger,"binarypath is "+binarypath);
+        }else {
+          PluginLogger.log(logger,"binarypath is not added");
+        }
+        
+        PluginLogger.log(logger,"Starting local");
+        try {
+          super.start(localOptions);
+        } catch (Exception e) {
+          StringWriter sw = new StringWriter();
+          e.printStackTrace(new PrintWriter(sw));
+          String exceptionAsString = sw.toString();
+          PluginLogger.log(logger,"Actual Exception is\n" + exceptionAsString);
+          throw e;
+        }
     }
 
     public void stop() throws Exception {
@@ -94,10 +119,13 @@ public class JenkinsBrowserStackLocal extends Local implements Serializable {
     }
 
     public void start(Launcher launcher) throws Exception {
+        PluginLogger.log(logger,"will be fetching launcher channels and calling start");
         launcher.getChannel().call(new MasterToSlaveCallable<Void, Exception>() {
             @Override
             public Void call() throws Exception {
+                PluginLogger.log(logger,"will call actual start method");
                 JenkinsBrowserStackLocal.this.start();
+                PluginLogger.log(logger,"start call completed");
                 return null;
             }
         });
